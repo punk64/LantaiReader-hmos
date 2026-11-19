@@ -1,0 +1,12 @@
+{
+  "name": "entry",
+  "version": "0.1.0",
+  "description": "LantaiReader entry module",
+  "main": "",
+  "author": "lantai",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ohos/unrar": "2.0.4",
+    "@ohos/oh7zip": "1.1.0"
+  }
+}

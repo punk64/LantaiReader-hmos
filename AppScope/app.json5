@@ -1,0 +1,10 @@
+{
+  "app": {
+    "bundleName": "org.lantai.reader",
+    "vendor": "lantai",
+    "versionCode": 1000300,
+    "versionName": "0.3.0",
+    "icon": "$media:app_icon",
+    "label": "$string:app_name"
+  }
+}

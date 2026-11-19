@@ -1,0 +1,40 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {
+    "nativeLib": {
+      "filter": {
+        "select": [
+          {
+            "package": "@ohos/oh7zip",
+            "excludePattern": [
+              "**/armeabi-v7a/**",
+              "**/x86_64/**"
+            ]
+          },
+          {
+            "package": "@ohos/unrar",
+            "excludePattern": [
+              "**/armeabi-v7a/**",
+              "**/x86_64/**"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "buildOptionSet": [
+    {
+      "name": "release",
+      "arkOptions": {
+        "obfuscation": {
+          "ruleOptions": {
+            "enable": false
+          }
+        }
+      }
+    }
+  ],
+  "targets": [
+    { "name": "default" }
+  ]
+}

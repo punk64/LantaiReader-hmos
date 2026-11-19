@@ -1,0 +1,7 @@
+{
+  "modelVersion": "5.0.4",
+  "description": "LantaiReader HarmonyOS client",
+  "dependencies": {},
+  "devDependencies": {},
+  "dynamicDependencies": {}
+}
