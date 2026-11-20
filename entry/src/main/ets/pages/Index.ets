@@ -111,7 +111,8 @@ struct Index {
       }
       ServerProfiles.load();
       C.apply(Prefs.read(PrefKeys.uiTheme));
-      Lang.code = Prefs.read(PrefKeys.lang) === Lang.en ? Lang.en : Lang.zh;
+      const savedLang: string = Prefs.read(PrefKeys.lang);
+      Lang.code = savedLang === Lang.en ? Lang.en : (savedLang === Lang.ja ? Lang.ja : Lang.zh);
       offlineDb.setServer(ServerProfiles.activeKey());
       offlineCache.setServer(ServerProfiles.activeKey());
       try {

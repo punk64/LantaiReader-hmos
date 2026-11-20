@@ -9,7 +9,7 @@ import { BookItem } from '../model/LantaiModels';
 import { ENTRY_FILE, ResourceProxy, VIRTUAL_ORIGIN } from '../net/ResourceProxy';
 import { NativeBridge } from '../net/NativeBridge';
 import { ttsService } from '../net/TtsService';
-import { t } from '../common/I18n';
+import { t, Lang } from '../common/I18n';
 
 const TAG: string = 'LantaiReader';
 
@@ -25,6 +25,7 @@ export class ReaderWeb {
   safeBottom: number = 0;
   loaded: boolean = false;
   bookId: string = '';
+  private lang: string = '';
 
   private readRaw(name: string): ArrayBuffer {
     const hit: ArrayBuffer | undefined = this.assets.get(name);
@@ -168,8 +169,13 @@ export class ReaderWeb {
     return rest;
   }
 
+  invalidate(): void {
+    this.loaded = false;
+    this.lang = '';
+  }
+
   open(bookId: string): void {
-    const same: boolean = this.loaded && this.bookId === bookId;
+    const same: boolean = this.loaded && this.bookId === bookId && this.lang === Lang.code;
     this.bookId = bookId;
     if (!this.attached) {
       this.pending = true;
@@ -200,7 +206,8 @@ export class ReaderWeb {
     if (bookId.length === 0) {
       return;
     }
-    const target: string = `${VIRTUAL_ORIGIN}/${ENTRY_FILE}?book=${bookId}`;
+    this.lang = Lang.code;
+    const target: string = `${VIRTUAL_ORIGIN}/${ENTRY_FILE}?book=${bookId}&lang=${this.lang}`;
     setTimeout(() => {
       const st: number = Math.round(this.safeTop);
       const sb: number = Math.round(this.safeBottom);

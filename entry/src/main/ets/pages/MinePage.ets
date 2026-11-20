@@ -20,6 +20,7 @@ import { AutoSwitch } from '../net/AutoSwitch';
 import { ActionBtn, GroupHead, NavRow, ScreenHead, ToggleRow } from '../components/Shell';
 import { Lang, t } from '../common/I18n';
 import { UpdateChecker, UpdateResult } from '../net/UpdateChecker';
+import { readerWeb } from '../components/ReadingWeb';
 interface MineMetric {
   value: string;
   label: string;
@@ -211,10 +212,13 @@ export struct MinePage {
         title: t('界面语言'),
         buttons: [
           { text: '简体中文', color: C.acc },
-          { text: 'English', color: C.acc }
+          { text: 'English', color: C.acc },
+          { text: '日本語', color: C.acc }
         ]
       });
-      Lang.apply(result.index === 1 ? 'en' : 'zh');
+      const codes: string[] = ['zh', 'en', 'ja'];
+      Lang.apply(codes[result.index] ?? 'zh');
+      readerWeb.invalidate();
       this.refreshLabels();
       this.loadMetrics();
     } catch (error) {
@@ -483,7 +487,7 @@ export struct MinePage {
   @Builder
   repoEditor() {
     Row({ space: 8 }) {
-      TextInput({ text: this.repoDraft, placeholder: 'owner/repo 或 https://…' })
+      TextInput({ text: this.repoDraft, placeholder: t('owner/repo 或 https://…') })
         .layoutWeight(1)
         .height(34)
         .fontSize(12)
@@ -647,7 +651,7 @@ export struct MinePage {
             NavRow({ glyph: 'sun', title: t('外观主题'), sub: t('深色与浅色，与网页版一致'), right: this.themeLabel, onTap: () => {
               this.pickTheme();
             } })
-            NavRow({ glyph: 'type', title: t('界面语言'), sub: t('简体中文与 English'), right: Lang.tag(), onTap: () => {
+            NavRow({ glyph: 'type', title: t('界面语言'), sub: '简体中文 / English / 日本語', right: Lang.tag(), onTap: () => {
               this.pickLang();
             } })
             ToggleRow({

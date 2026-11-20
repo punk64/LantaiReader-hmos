@@ -1,6 +1,7 @@
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { zlib } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
+import { t } from '../common/I18n';
 
 const ENTRY_LIMIT: number = 96 * 1024 * 1024;
 const DIRECTORY_LIMIT: number = 32 * 1024 * 1024;
@@ -76,7 +77,7 @@ export class ZipBook {
 
   private async readRange(offset: number, size: number): Promise<ArrayBuffer> {
     if (offset < 0 || size < 0) {
-      throw new Error('读取位置越界');
+      throw new Error(t('读取位置越界'));
     }
     const file: fs.File = await fs.open(this.path, fs.OpenMode.READ_ONLY);
     try {
@@ -113,7 +114,7 @@ export class ZipBook {
     }
     const total: number = await this.sizeOf();
     if (total < 22) {
-      throw new Error('不是有效的 EPUB 压缩包');
+      throw new Error(t('不是有效的 EPUB 压缩包'));
     }
     const tailSize: number = Math.min(total, TAIL_LIMIT);
     const tail: ArrayBuffer = await this.readRange(total - tailSize, tailSize);
@@ -134,7 +135,7 @@ export class ZipBook {
       break;
     }
     if (directoryOffset < 0 || count === 0 || count > COUNT_LIMIT || directorySize > DIRECTORY_LIMIT) {
-      throw new Error('EPUB 目录结构不受支持');
+      throw new Error(t('EPUB 目录结构不受支持'));
     }
     const directory: ArrayBuffer = await this.readRange(directoryOffset, directorySize);
     const dirView: DataView = new DataView(directory);
@@ -142,7 +143,7 @@ export class ZipBook {
     let cursor: number = 0;
     for (let index: number = 0; index < count; index++) {
       if (cursor + 46 > directory.byteLength || dirView.getUint32(cursor, true) !== 0x02014b50) {
-        throw new Error('EPUB 目录条目损坏');
+        throw new Error(t('EPUB 目录条目损坏'));
       }
       const flags: number = dirView.getUint16(cursor + 8, true);
       const method: number = dirView.getUint16(cursor + 10, true);
@@ -154,7 +155,7 @@ export class ZipBook {
       const commentLength: number = dirView.getUint16(cursor + 32, true);
       const recordSize: number = 46 + nameLength + extraLength + commentLength;
       if (cursor + recordSize > directory.byteLength) {
-        throw new Error('EPUB 目录条目损坏');
+        throw new Error(t('EPUB 目录条目损坏'));
       }
       const name: string = decodeName(new Uint8Array(directory, cursor + 46, nameLength));
       const start: number = dirView.getUint32(cursor + 42, true);
@@ -198,13 +199,13 @@ export class ZipBook {
     }
     const header: DataView = new DataView(await this.readRange(target.offset, 30));
     if (header.byteLength < 30 || header.getUint32(0, true) !== 0x04034b50) {
-      throw new Error('EPUB 条目头损坏');
+      throw new Error(t('EPUB 条目头损坏'));
     }
     const dataOffset: number = target.offset + 30 + header.getUint16(26, true) + header.getUint16(28, true);
     const input: ArrayBuffer = await this.readRange(dataOffset, target.compressedSize);
     const output: ArrayBuffer = target.method === 0 ? input : await this.inflate(input, target.size);
     if (output.byteLength !== target.size || crcOf(output) !== target.crc) {
-      throw new Error('EPUB 条目校验失败');
+      throw new Error(t('EPUB 条目校验失败'));
     }
     return output;
   }
@@ -228,7 +229,7 @@ export class ZipBook {
     try {
       const status: number = await zip.inflate(stream, zlib.CompressFlushMode.FINISH);
       if (status !== zlib.ReturnStatus.STREAM_END && status !== zlib.ReturnStatus.OK) {
-        throw new Error('EPUB 条目解压失败');
+        throw new Error(t('EPUB 条目解压失败'));
       }
       return buffer.slice(0, size);
     } finally {

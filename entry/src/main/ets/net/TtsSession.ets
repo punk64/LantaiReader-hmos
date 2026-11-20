@@ -2,6 +2,7 @@ import { avSession } from '@kit.AVSessionKit';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { backgroundTask } from './BackgroundTask';
+import { t } from '../common/I18n';
 
 const TAG: string = 'LantaiTts';
 
@@ -68,7 +69,7 @@ export class TtsSession {
       }
       const meta: avSession.AVMetadata = {
         assetId: 'lantai-tts',
-        title: this.title.length > 0 ? this.title : '兰台阅读',
+        title: this.title.length > 0 ? this.title : t('兰台阅读'),
         artist: sub
       };
       await this.ses.setAVMetadata(meta);

@@ -6,6 +6,7 @@ import { util } from '@kit.ArkTS';
 import { LocalFiles } from './LocalFiles';
 import { LocalMeta, localKindOf } from './LocalMeta';
 import { ZipBook } from './ZipBook';
+import { t } from '../common/I18n';
 
 export const LOCAL_ORIGIN: string = 'https://lantai.example';
 
@@ -312,7 +313,7 @@ export class LocalBookSource {
   async preflight(id: string): Promise<string> {
     const meta: LocalMeta | null = this.metaOf(id);
     if (meta === null) {
-      return '这本书还没有完成解析';
+      return t('这本书还没有完成解析');
     }
     if (this.opened.has(id) || this.base.length === 0) {
       return '';
@@ -325,7 +326,7 @@ export class LocalBookSource {
       await LocalFiles.copyInto(meta.uri, path);
       return '';
     } catch (error) {
-      return '原文件已无法访问，请重新导入';
+      return t('原文件已无法访问，请重新导入');
     }
   }
 
@@ -448,10 +449,10 @@ export class LocalBookSource {
     }
     const meta: LocalMeta | null = this.metaOf(id);
     if (meta === null) {
-      throw new Error('本地书不存在');
+      throw new Error(t('本地书不存在'));
     }
     if (this.base.length === 0) {
-      throw new Error('本机目录未初始化');
+      throw new Error(t('本机目录未初始化'));
     }
     const opened: OpenedLocal = new OpenedLocal();
     opened.id = id;
@@ -472,10 +473,10 @@ export class LocalBookSource {
     } else if (opened.kind === 'pdf') {
       await this.indexPdf(opened);
     } else {
-      throw new Error('该格式不支持统一阅读');
+      throw new Error(t('该格式不支持统一阅读'));
     }
     if (opened.chapters.length === 0) {
-      throw new Error('没有可显示的内容');
+      throw new Error(t('没有可显示的内容'));
     }
     this.remember(id, opened);
     return opened;
@@ -488,7 +489,7 @@ export class LocalBookSource {
     const rootTag: RegExpExecArray | null = /<rootfile\b[^>]*>/.exec(container);
     const opfRel: string = rootTag !== null ? attrOf(rootTag[0], 'full-path') : '';
     if (opfRel.length === 0) {
-      throw new Error('EPUB 缺少 OPF');
+      throw new Error(t('EPUB 缺少 OPF'));
     }
     const opfPath: string = cleanPath(decodeHref(opfRel));
     const opfDir: string = dirOf(opfPath);
@@ -695,7 +696,7 @@ export class LocalBookSource {
 
   private async indexPdf(opened: OpenedLocal): Promise<void> {
     if (!canIUse('SystemCapability.OfficeService.PDFService.Core')) {
-      throw new Error('当前设备缺少 PDF 渲染能力');
+      throw new Error(t('当前设备缺少 PDF 渲染能力'));
     }
     const document: pdfService.PdfDocument = new pdfService.PdfDocument();
     const result: pdfService.ParseResult = document.loadDocument(opened.path);
@@ -719,7 +720,7 @@ export class LocalBookSource {
       }
     }
     if (target === null) {
-      throw new Error('章节不存在');
+      throw new Error(t('章节不存在'));
     }
     const html: string = await this.htmlOf(opened, target);
     const dto: LocalChapterDto = {
@@ -738,7 +739,7 @@ export class LocalBookSource {
     }
     if (opened.kind === 'txt') {
       const index: number = chapter.n - 1;
-      return index >= 0 && index < opened.texts.length ? opened.texts[index] : '<p>（本章为空）</p>';
+      return index >= 0 && index < opened.texts.length ? opened.texts[index] : t('<p>（本章为空）</p>');
     }
     return `<div class="pdf-page"><img src="${this.assetUrl(opened.id, `page:${chapter.n}`)}" alt="" /></div>`;
   }
@@ -746,13 +747,13 @@ export class LocalBookSource {
   private async epubHtml(opened: OpenedLocal, chapter: LocalChapter): Promise<string> {
     const book: ZipBook | null = opened.zip;
     if (book === null) {
-      throw new Error('EPUB 未打开');
+      throw new Error(t('EPUB 未打开'));
     }
     let source: string = '';
     try {
       source = await book.text(chapter.href);
     } catch (error) {
-      return '<p>（本章读取失败）</p>';
+      return t('<p>（本章读取失败）</p>');
     }
     const bodyPattern: RegExp = /<body\b[^>]*>([\s\S]*)<\/body>/i;
     const match: RegExpExecArray | null = bodyPattern.exec(source);
@@ -895,7 +896,7 @@ export class LocalBookSource {
   private async renderPage(opened: OpenedLocal, page: number): Promise<ArrayBuffer> {
     const document: pdfService.PdfDocument | null = opened.doc;
     if (document === null) {
-      throw new Error('PDF 未打开');
+      throw new Error(t('PDF 未打开'));
     }
     const pdfPage: pdfService.PdfPage = document.getPage(page - 1);
     const pixel: image.PixelMap = pdfPage.getPagePixelMap();

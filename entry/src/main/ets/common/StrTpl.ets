@@ -114,6 +114,7 @@ function build(): Map<string, string> {
   m.set('{0} 本书已从兰台移除，其会话与进度已丢弃', '{0} books were removed from Lantai; their sessions and progress were discarded');
   m.set('已清理 {0} 本失效副本', 'Cleaned {0} stale copies');
   m.set('{0} 本离线副本已从兰台移除', '{0} offline copies were removed from Lantai');
+  m.set('每页 {0}', '{0} per page');
   return m;
 }
 
