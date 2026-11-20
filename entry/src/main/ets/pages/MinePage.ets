@@ -1,4 +1,4 @@
-import { bundleManager } from '@kit.AbilityKit';
+import { bundleManager, common, Want } from '@kit.AbilityKit';
 import { image } from '@kit.ImageKit';
 import { promptAction } from '@kit.ArkUI';
 import { C, FT, R, S } from '../common/Theme';
@@ -230,7 +230,7 @@ export struct MinePage {
     const result: UpdateResult = await UpdateChecker.check(this.version);
     if (result.state === 'new') {
       this.updateLabel = t('发现新版本') + ' · ' + result.version;
-      promptAction.showDialog({
+      const answer: promptAction.ShowDialogSuccessResponse = await promptAction.showDialog({
         title: t('发现新版本') + ' · ' + result.version,
         message: result.notes.length > 0 ? result.notes : t('当前版本') + ' ' + this.version,
         buttons: [
@@ -238,6 +238,15 @@ export struct MinePage {
           { text: t('下载'), color: C.acc }
         ]
       });
+      if (answer.index === 1 && result.url.length > 0) {
+        const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+        const want: Want = {
+          action: 'ohos.want.action.viewData',
+          entities: ['entity.system.browsable'],
+          uri: result.url
+        };
+        ctx.startAbility(want).catch(() => {});
+      }
     } else if (result.state === 'latest') {
       this.updateLabel = t('已是最新版本');
       promptAction.showToast({ message: t('已是最新版本') + ' · ' + this.version });

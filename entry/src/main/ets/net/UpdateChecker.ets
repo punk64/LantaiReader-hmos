@@ -11,7 +11,7 @@ export class UpdateResult {
 }
 
 export class UpdateChecker {
-  static readonly fallback: string = 'lantai-reader/LantaiReader';
+  static readonly fallback: string = 'punk64/LantaiReader-hmos';
 
   static source(): string {
     const saved: string = Prefs.read(PrefKeys.repo).trim();
